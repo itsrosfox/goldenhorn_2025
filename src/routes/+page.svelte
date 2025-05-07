@@ -1,0 +1,76 @@
+<script>
+    const parallaxConfig = [
+        {"name": "sky.png", "offset": [0,0], "speed": 0.99},
+        {"name": "far_mountains.png", "offset": [0,0], "speed": 0.95},
+        {"name": "near_mountains.png", "offset": [0,0], "speed": 0.9},
+        {"name": "trees.png", "offset": [0,0], "speed": 0.8},
+        {"name": "wtf.png", "offset": [0,0], "speed": 0.78},
+        {"name": "barn.png", "offset": [0,0], "speed": 0.75},
+        {"name": "far_field.png", "offset": [0,0], "speed": 0.73},
+        {"name": "near_field.png", "offset": [0,0], "speed": 0.65},
+        {"name": "cocks.png", "offset": [0,0], "speed": 0.55},
+        {"name": "goldy.png", "offset": [0,0], "speed": 0.5},
+        {"name": "hen.png", "offset": [0,0], "speed": 0.1},
+        {"name": "bottom.png", "offset": [0,0], "speed": 0.05},
+        {"name": "aw_my_gawd.png", "offset": [0,0], "speed": 0.0},
+    ];
+
+    let width = $state(1920);
+    let height = $state(1080);
+    let scroll = $state(0);
+
+    let configWidth = 2696;
+    let configHeight = 1418;
+    let configAspectRatio = $derived(configWidth / configHeight);
+
+    let parallaxHeight = $derived(height);
+    let parallaxWidth = $derived(parallaxHeight * configAspectRatio);
+</script>
+
+<svelte:window bind:innerWidth={width} bind:innerHeight={height} bind:scrollY={scroll}></svelte:window>
+
+<main class="main">
+    <div class="parallax">
+        {#each parallaxConfig as c, i}
+        <div 
+            class="parallax-layer"
+            style:background-image="url('./images/{c.name}')"
+            style:background-size="contain"
+            style:width="{parallaxWidth}px"
+            style:height="{parallaxHeight}px"
+            style:top="{scroll * c.speed}px"
+        ></div>
+        {/each}
+    </div>
+    <div class="info">
+        info
+    </div>
+</main>
+
+<style>
+.main {
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.parallax {
+    width: 100%;
+    height: 100vh;
+    
+    overflow: hidden;
+    position: relative;
+}
+
+.parallax-layer {
+    position: absolute;
+    z-index: -1;
+}
+
+.info {
+    background-color: gray;
+    width: 100%;
+    min-height: 100vh;
+}
+</style>
