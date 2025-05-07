@@ -11,7 +11,7 @@
         {"name": "cocks.png", "offset": [0,0], "speed": 0.3},
         {"name": "goldy.png", "offset": [0,0], "speed": 0.2},
         {"name": "hen.png", "offset": [0,0], "speed": 0.1},
-        {"name": "bottom.png", "offset": [0,0], "speed": 0.05},
+        {"name": "bottom.png", "offset": [0,220], "speed": -0.2},
         {"name": "aw_my_gawd.png", "offset": [0,0], "speed": 0.0},
     ];
 
@@ -38,7 +38,7 @@
             style:background-size="{parallaxWidth}px {parallaxHeight}px"
             style:width="{width}px"
             style:height="{height}px"
-            style:top="{scroll * c.speed}px"
+            style:top="{c.offset[1] + scroll * c.speed}px"
         ></div>
         {/each}
     </div>
