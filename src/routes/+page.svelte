@@ -11,7 +11,7 @@
         {name: "cocks.png", offset: [0,0], speed: 0.3},
         {name: "goldy.png", offset: [0,0], speed: 0.2},
         {name: "hen.png", offset: [0,0], speed: 0.1},
-        {name: "bottom.png", offset: [0,220], speed: -0.2},
+        {name: "bottom.png", offset: [0,100], speed: -0.2},
         {name: "aw_my_gawd.png", offset: [0,0], speed: 0.0},
     ];
 
@@ -36,7 +36,7 @@
             class="parallax-layer"
             style:background-image="url('./images/{c.name}')"
             style:background-size="{parallaxWidth}px {parallaxHeight}px"
-            style:top="{c.offset[1] + scroll * c.speed}px"
+            style:top="{Math.max(c.offset[1] * configAspectRatio + scroll * c.speed, 0)}px"
         ></div>
         {/each}
     </div>
