@@ -1,18 +1,18 @@
 <script>
     const parallaxConfig = [
-        {"name": "sky.png", "offset": [0,0], "speed": 0.99},
-        {"name": "far_mountains.png", "offset": [0,0], "speed": 0.95},
-        {"name": "near_mountains.png", "offset": [0,0], "speed": 0.9},
-        {"name": "trees.png", "offset": [0,0], "speed": 0.8},
-        {"name": "wtf.png", "offset": [0,0], "speed": 0.7},
-        {"name": "barn.png", "offset": [0,0], "speed": 0.6},
-        {"name": "far_field.png", "offset": [0,0], "speed": 0.5},
-        {"name": "near_field.png", "offset": [0,0], "speed": 0.4},
-        {"name": "cocks.png", "offset": [0,0], "speed": 0.3},
-        {"name": "goldy.png", "offset": [0,0], "speed": 0.2},
-        {"name": "hen.png", "offset": [0,0], "speed": 0.1},
-        {"name": "bottom.png", "offset": [0,220], "speed": -0.2},
-        {"name": "aw_my_gawd.png", "offset": [0,0], "speed": 0.0},
+        {name: "sky.png", offset: [0,0], speed: 0.99},
+        {name: "far_mountains.png", offset: [0,0], speed: 0.95},
+        {name: "near_mountains.png", offset: [0,0], speed: 0.9},
+        {name: "trees.png", offset: [0,0], speed: 0.8},
+        {name: "wtf.png", offset: [0,0], speed: 0.7},
+        {name: "barn.png", offset: [0,0], speed: 0.6},
+        {name: "far_field.png", offset: [0,0], speed: 0.5},
+        {name: "near_field.png", offset: [0,0], speed: 0.4},
+        {name: "cocks.png", offset: [0,0], speed: 0.3},
+        {name: "goldy.png", offset: [0,0], speed: 0.2},
+        {name: "hen.png", offset: [0,0], speed: 0.1},
+        {name: "bottom.png", offset: [0,220], speed: -0.2},
+        {name: "aw_my_gawd.png", offset: [0,0], speed: 0.0},
     ];
 
     let width = $state(1920);
@@ -36,8 +36,6 @@
             class="parallax-layer"
             style:background-image="url('./images/{c.name}')"
             style:background-size="{parallaxWidth}px {parallaxHeight}px"
-            style:width="{width}px"
-            style:height="{height}px"
             style:top="{c.offset[1] + scroll * c.speed}px"
         ></div>
         {/each}
@@ -58,16 +56,15 @@
 .parallax {
     width: 100%;
     height: 100vh;
-    
     overflow: hidden;
     position: relative;
 }
 
 .parallax-layer {
+    width: 100%;
+    height: 100%;
     position: absolute;
-    background-size: contain;
-    background-position: center;
-    z-index: -1;
+    background-position: center center;
 }
 
 .info {
