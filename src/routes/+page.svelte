@@ -27,7 +27,7 @@
     let parallaxWidth = $derived(parallaxHeight * configAspectRatio);
 </script>
 
-<svelte:window bind:innerWidth={width} bind:innerHeight={height} bind:scrollY={scroll}></svelte:window>
+<svelte:window bind:outerWidth={width} bind:outerHeight={height} bind:scrollY={scroll}></svelte:window>
 
 <main class="main">
     <div class="parallax">
@@ -35,9 +35,9 @@
         <div 
             class="parallax-layer"
             style:background-image="url('./images/{c.name}')"
-            style:background-size="contain"
-            style:width="{parallaxWidth}px"
-            style:height="{parallaxHeight}px"
+            style:background-size="{parallaxWidth}px {parallaxHeight}px"
+            style:width="{width}px"
+            style:height="{height}px"
             style:top="{scroll * c.speed}px"
         ></div>
         {/each}
@@ -65,6 +65,8 @@
 
 .parallax-layer {
     position: absolute;
+    background-size: contain;
+    background-position: center;
     z-index: -1;
 }
 
