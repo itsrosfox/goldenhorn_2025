@@ -64,12 +64,32 @@
     width: 100%;
     height: 100%;
     position: absolute;
-    background-position: center center;
 }
 
 .info {
     background-color: gray;
     width: 100%;
     min-height: 100vh;
+}
+
+@media (min-width: 1921px) {
+    .parallax-layer {
+        background-position: center center;
+    }
+}
+@media (max-width: 1920px) {
+    .parallax-layer {
+        background-position: center center;
+    }
+}
+@media (max-width: 1280px) {
+    .parallax-layer {
+        background-position: 35% center;
+    }
+}
+@media (max-width: 480px) {
+    .parallax-layer {
+        background-position: 30% center;
+    }
 }
 </style>
