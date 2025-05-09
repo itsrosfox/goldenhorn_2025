@@ -5,17 +5,16 @@
 	let height = $state(1080);
 	let scroll = $state(0);
 
-	// onMount(() => {
-	// 	// give the browser a tick to render
-	// 	setTimeout(() => {
-	// 		requestAnimationFrame(() => {
-	// 			window.scrollTo({
-	// 				top: window.innerHeight * 0.2, // for example, 80% down
-	// 				behavior: 'smooth'
-	// 			});
-	// 		});
-	// 	}, 1000);
-	// });
+	onMount(() => {
+		setTimeout(() => {
+			requestAnimationFrame(() => {
+				window.scrollTo({
+					top: window.innerHeight * 0.2,
+					behavior: 'smooth'
+				});
+			});
+		}, 1000);
+	});
 
 	const configWidth = 1920;
 	const configHeight = 1262;
@@ -26,7 +25,7 @@
 	const parallaxHeight = $derived(landscape ? width / configAspectRatio : height);
 	const parallaxWidth = $derived(landscape ? width : height * configAspectRatio);
 
-	const aw_shit = $derived(scroll / height > 0.5);
+	const aw_shit = $derived(scroll / height > 0.8);
 
 	const moo_start: [number, number] = $derived([-5, 20]);
 	const moo_end: [number, number] = $derived([65, -130]);
@@ -55,7 +54,7 @@
 		'hen.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
 		'aw_shit.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: false, scale: 1.0 },
 		'bottom.png': { offset: [0, 350], max: [0, 150], speed: -0.4, visible: true, scale: 1.0 },
-		'aw_my_gawd.png': { offset: [0,0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
+		'aw_my_gawd.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
 		'leaves.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 }
 	};
 
@@ -74,16 +73,24 @@
 			class="sky"
 			style:background-image="url('./images/sky.png')"
 			style:background-size="{parallaxWidth}px {parallaxHeight}px"
-			style:top="calc({scroll * 1.0}px)"
+			style:margin-top="calc({scroll * 1.0}px)"
 		></div>
+
+		<img
+			class="title"
+			src="./images/logo.webp"
+			alt="depicts the official GoldenHorn logo of a black goat with long curved golden horns"
+			style:margin-top="calc(20vh + {scroll * 0.6}px)"
+		/>
+
 		{#each Object.entries(parallaxConfig) as [name, c], i}
 			<div
 				class="parallax-layer"
 				style:visibility={c.visible ? 'visible' : 'hidden'}
 				style:background-image="url('./images/{name}')"
 				style:background-size="{parallaxWidth}px {parallaxHeight}px"
-				style:left="{c.offset[0]}px"
-				style:top="calc(var(--sky-height) + {Math.max(
+				style:margin-left="{c.offset[0]}px"
+				style:margin-top="calc(var(--sky-height) + {Math.max(
 					c.offset[1] * configAspectRatio + scroll * c.speed,
 					c.max[1]
 				)}px)"
@@ -92,12 +99,7 @@
 			></div>
 		{/each}
 	</div>
-	<img
-		class="title"
-		src="./images/logo.webp"
-		alt="depicts the official GoldenHorn logo of a black goat with long curved golden horns"
-		style:top="calc(20vh + {scroll * 0.6}px)"
-	/>
+
 	<div class="info"></div>
 </main>
 
@@ -111,25 +113,31 @@
 		align-content: center;
 		justify-content: center;
 		flex-direction: column;
+        background-color: rgb(173, 235, 243);
 	}
 
 	.title {
+		grid-area: bla;
 		display: flex;
-		position: absolute;
-		align-self: center;
+		position: sticky;
+		align-self: start;
+        justify-self: center;
 		width: 20rem;
-		z-index: 1;
+		z-index: 15;
 	}
 
 	.parallax {
+		height: 185vh;
 		width: 100%;
 		position: relative;
-        overflow: hidden;
-        
+		overflow: hidden;
+		display: grid;
+		grid-template-areas: 'bla';
 	}
 
 	.sky {
-		position: absolute;
+		position: sticky;
+		grid-area: bla;
 		width: 100%;
 		height: 100%;
 		background-repeat: no-repeat;
@@ -137,9 +145,10 @@
 	}
 
 	.parallax-layer {
+		grid-area: bla;
 		width: 100%;
 		height: 100%;
-		position: absolute;
+		position: sticky;
 		background-repeat: no-repeat;
 	}
 
@@ -150,11 +159,10 @@
 		z-index: 10;
 	}
 
-    @media (min-width: 1921px) {
-        .parallax {
-            height: 185vh;
-            margin-bottom: -30vh;
-        }
+	@media (min-width: 1921px) {
+		.parallax {
+			margin-bottom: -30vh;
+		}
 
 		.parallax-layer {
 			background-position: center top;
@@ -165,10 +173,9 @@
 		}
 	}
 	@media (max-width: 1920px) {
-        .parallax {
-            height: 185vh;
-            margin-bottom: -30vh;
-        }
+		.parallax {
+			margin-bottom: -30vh;
+		}
 
 		.parallax-layer {
 			background-position-x: center;
@@ -179,10 +186,9 @@
 		}
 	}
 	@media (max-width: 1280px) {
-        .parallax {
-            height: 185vh;
-            margin-bottom: -50vh;
-        }
+		.parallax {
+			margin-bottom: -50vh;
+		}
 
 		.parallax-layer {
 			background-position-x: 35%;
@@ -193,18 +199,16 @@
 		}
 	}
 	@media (max-width: 480px) {
-        .parallax {
-            height: 185vh;
-            margin-bottom: -50vh;
-        }
+		.parallax {
+			margin-bottom: -50vh;
+		}
 
 		.parallax-layer {
-			background-position-x: 30%;
+			background-position-x: 27.5%;
 		}
 
 		.title {
 			font-size: 3rem;
 		}
 	}
-
 </style>
