@@ -15,17 +15,18 @@
 	// 	}, 1000);
 	// });
 
-	const configWidth = 2696;
-	const configHeight = 1418;
+	const configWidth = 1920;
+	const configHeight = 1262;
 	const configAspectRatio = $derived(configWidth / configHeight);
 
-	const parallaxHeight = $derived(height);
-	const parallaxWidth = $derived(parallaxHeight * configAspectRatio);
+    const parallaxWidth = $derived(width);
+	const parallaxHeight = $derived(parallaxWidth / configAspectRatio);
 
-	const aw_shit = $derived(scroll / height > 0.75);
 
-	const moo_start: [number, number] = $derived([-10, 20]);
-	const moo_end: [number, number] = $derived([80, -100]);
+	const aw_shit = $derived(scroll / height > 0.7);
+
+	const moo_start: [number, number] = $derived([-5, 20]);
+	const moo_end: [number, number] = $derived([65, -130]);
 	const my_planet_needs_me = $derived(scroll / height);
 
 	function Lerp(from: number, to: number, t: number): number {
@@ -49,12 +50,13 @@
 		'goldy.png': { offset: [0, 0], max: [0, 0], speed: 0.2, visible: true, scale: 1.0 },
 		'hen.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
 		'aw_shit.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: false, scale: 1.0 },
-		'bottom.png': { offset: [0, 200], max: [0, 50], speed: -0.4, visible: true, scale: 1.0 }
+		'bottom.png': { offset: [0, 200], max: [0, 10], speed: -0.4, visible: true, scale: 1.0 },
 	};
 
 	$effect(() => {
 		parallaxConfig['aw_shit.png'].visible = aw_shit;
 		parallaxConfig['moo.png'].offset = Lerp2D(moo_start, moo_end, my_planet_needs_me);
+        // parallaxConfig['moo.png'].scale = Lerp(1.0, 0.1, my_planet_needs_me);
 	});
 </script>
 
@@ -87,13 +89,13 @@
 	<div
 		class="parallax-layer"
 		style:background-image="url('./images/aw_my_gawd.png')"
-		style:background-size="{parallaxWidth}px {parallaxHeight}px"
 		style:height="100%"
-		style:top="var(--sky-height)"
 		style:z-index="14"
+        style:top=50vh
 	></div>
 
-	<img
+
+    <img
 		class="title"
 		src="./images/logo.webp"
 		alt="depicts the official GoldenHorn logo of a black goat with long curved golden horns"
@@ -105,7 +107,7 @@
 
 <style>
 	:root {
-		--sky-height: 40vh;
+		--sky-height: 30vh;
 	}
 
 	.main {
