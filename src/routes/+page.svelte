@@ -1,19 +1,18 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
-
 	let width = $state(1920);
 	let height = $state(1080);
 	let scroll = $state(0);
 
 	// onMount(() => {
 	// 	// give the browser a tick to render
-	// 	requestAnimationFrame(() => {
-	// 		window.scrollTo({
-	// 			top: window.innerHeight * 0.2, // for example, 80% down
-	// 			behavior: 'smooth'
+	// 	setTimeout(() => {
+	// 		requestAnimationFrame(() => {
+	// 			window.scrollTo({
+	// 				top: window.innerHeight * 0.2, // for example, 80% down
+	// 				behavior: 'smooth'
+	// 			});
 	// 		});
-	// 	});
+	// 	}, 1000);
 	// });
 
 	const configWidth = 2696;
@@ -23,7 +22,7 @@
 	const parallaxHeight = $derived(height);
 	const parallaxWidth = $derived(parallaxHeight * configAspectRatio);
 
-	const aw_shit = $derived(scroll / height > 0.6);
+	const aw_shit = $derived(scroll / height > 0.75);
 
 	const moo_start: [number, number] = $derived([-10, 20]);
 	const moo_end: [number, number] = $derived([80, -100]);
@@ -37,11 +36,8 @@
 		return [Lerp(from[0], to[0], t), Lerp(from[1], to[1], t)];
 	}
 
-	/*style:top="{Math.max(c.offset[1] * configAspectRatio + scroll * c.speed, 0)}px"*/
-
 	const parallaxConfig = {
-		'sky.png': { offset: [0, 0], max: [0, 0], speed: 0.99, visible: true, scale: 1.0 },
-		'far_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.95, visible: true, scale: 1.0 },
+        'far_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.93, visible: true, scale: 1.0 },
 		'near_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.9, visible: true, scale: 1.0 },
 		'trees.png': { offset: [0, 0], max: [0, 0], speed: 0.8, visible: true, scale: 1.0 },
 		'moo.png': { offset: moo_start, max: [0, 0], speed: 0.7, visible: true, scale: 1.0 },
@@ -53,8 +49,7 @@
 		'goldy.png': { offset: [0, 0], max: [0, 0], speed: 0.2, visible: true, scale: 1.0 },
 		'hen.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
 		'aw_shit.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: false, scale: 1.0 },
-		'bottom.png': { offset: [0, 200], max: [0, 50], speed: -0.4, visible: true, scale: 1.0 },
-		'aw_my_gawd.png': { offset: [0, 0], max: [0, 0], speed: 0.0, visible: true, scale: 1.0 }
+		'bottom.png': { offset: [0, 200], max: [0, 50], speed: -0.4, visible: true, scale: 1.0 }
 	};
 
 	$effect(() => {
@@ -66,8 +61,13 @@
 <svelte:window bind:outerWidth={width} bind:outerHeight={height} bind:scrollY={scroll} />
 
 <main class="main">
-	<div class="title" style:top="calc(25vh + {scroll * 0.5}px)">GoldenHorn '25</div>
 	<div class="parallax">
+		<div
+			class="sky"
+			style:background-image="url('./images/sky.png')"
+            style:background-size="{parallaxWidth}px {parallaxHeight}px"
+            style:top="calc({scroll * 1.0}px)"
+		></div>
 		{#each Object.entries(parallaxConfig) as [name, c], i}
 			<div
 				class="parallax-layer"
@@ -80,9 +80,26 @@
 					c.max[1]
 				)}px)"
 				style:scale={c.scale}
+				style:z-index={i}
 			></div>
 		{/each}
 	</div>
+	<div
+		class="parallax-layer"
+		style:background-image="url('./images/aw_my_gawd.png')"
+		style:background-size="{parallaxWidth}px {parallaxHeight}px"
+		style:height="100%"
+		style:top="var(--sky-height)"
+		style:z-index="14"
+	></div>
+
+	<img
+		class="title"
+		src="./images/logo.webp"
+		alt="depicts the official GoldenHorn logo of a black goat with long curved golden horns"
+		style:top="calc(20vh + {scroll * 0.6}px)"
+	/>
+
 	<div class="info">info</div>
 </main>
 
@@ -100,26 +117,33 @@
 	}
 
 	.title {
-		top: var(--sky-height);
 		display: flex;
 		position: absolute;
-		width: 100%;
-		align-items: center;
-		justify-content: center;
+		align-self: center;
+		width: 20rem;
 		z-index: 1;
 	}
 
 	.parallax {
 		width: 100%;
 		height: 140vh;
-		overflow: hidden;
 		position: relative;
+		overflow: hidden;
 	}
+
+    .sky {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        background-position-x:center;
+    }
 
 	.parallax-layer {
 		width: 100%;
 		height: 100%;
 		position: absolute;
+		background-size: contain;
 		background-repeat: no-repeat;
 	}
 
@@ -127,6 +151,7 @@
 		background-color: rgb(68, 51, 27);
 		width: 100%;
 		min-height: 100vh;
+		z-index: 13;
 	}
 
 	@media (min-width: 1921px) {
