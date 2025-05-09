@@ -1,39 +1,39 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+	import { onMount } from 'svelte';
 
 	let width = $state(1920);
 	let height = $state(1080);
 	let scroll = $state(0);
 
-	onMount(() => {
-		// give the browser a tick to render
-		setTimeout(() => {
-			requestAnimationFrame(() => {
-				window.scrollTo({
-					top: window.innerHeight * 0.2, // for example, 80% down
-					behavior: 'smooth'
-				});
-			});
-		}, 1000);
-	});
+	// onMount(() => {
+	// 	// give the browser a tick to render
+	// 	setTimeout(() => {
+	// 		requestAnimationFrame(() => {
+	// 			window.scrollTo({
+	// 				top: window.innerHeight * 0.2, // for example, 80% down
+	// 				behavior: 'smooth'
+	// 			});
+	// 		});
+	// 	}, 1000);
+	// });
 
 	const configWidth = 1920;
 	const configHeight = 1262;
 	const configAspectRatio = $derived(configWidth / configHeight);
 
-    const landscape = $derived(width > height);
+	const landscape = $derived(width > height);
 
 	const parallaxHeight = $derived(landscape ? width / configAspectRatio : height);
-    const parallaxWidth = $derived(landscape ? width : height * configAspectRatio);
+	const parallaxWidth = $derived(landscape ? width : height * configAspectRatio);
 
-	const aw_shit = $derived(scroll / height > 0.6);
+	const aw_shit = $derived(scroll / height > 0.5);
 
 	const moo_start: [number, number] = $derived([-5, 20]);
 	const moo_end: [number, number] = $derived([65, -130]);
 	const my_planet_needs_me = $derived(scroll / height);
 
 	function Lerp(from: number, to: number, t: number): number {
-        return (1 - t) * from + t * to;
+		return (1 - t) * from + t * to;
 	}
 
 	function Lerp2D(from: [number, number], to: [number, number], t: number): [number, number] {
@@ -45,7 +45,8 @@
 		'near_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.9, visible: true, scale: 1.0 },
 		'trees.png': { offset: [0, 0], max: [0, 0], speed: 0.8, visible: true, scale: 1.0 },
 		'moo.png': { offset: moo_start, max: [0, 0], speed: 0.7, visible: true, scale: 1.0 },
-		'wtf.png': { offset: [0, 0], max: [0, 0], speed: 0.7, visible: true, scale: 1.0 },
+		'mukice.png': { offset: [0, 0], max: [0, 0], speed: 0.7, visible: true, scale: 1.0 },
+		'ufo.png': { offset: [0, 0], max: [0, 0], speed: 0.7, visible: true, scale: 1.0 },
 		'barn.png': { offset: [0, 0], max: [0, 0], speed: 0.6, visible: true, scale: 1.0 },
 		'far_field.png': { offset: [0, 0], max: [0, 0], speed: 0.5, visible: true, scale: 1.0 },
 		'near_field.png': { offset: [0, 0], max: [0, 0], speed: 0.4, visible: true, scale: 1.0 },
@@ -53,7 +54,9 @@
 		'goldy.png': { offset: [0, 0], max: [0, 0], speed: 0.2, visible: true, scale: 1.0 },
 		'hen.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
 		'aw_shit.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: false, scale: 1.0 },
-		'bottom.png': { offset: [0, 200], max: [0, 10], speed: -0.4, visible: true, scale: 1.0 }
+		'bottom.png': { offset: [0, 350], max: [0, 150], speed: -0.4, visible: true, scale: 1.0 },
+		'aw_my_gawd.png': { offset: [0,0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
+		'leaves.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 }
 	};
 
 	$effect(() => {
@@ -84,27 +87,18 @@
 					c.offset[1] * configAspectRatio + scroll * c.speed,
 					c.max[1]
 				)}px)"
-				style:scale={c.scale}
+				style:transform="translateY(100px)"
 				style:z-index={i}
 			></div>
 		{/each}
 	</div>
-	<div
-		class="parallax-layer"
-		style:background-image="url('./images/aw_my_gawd.png')"
-		style:height="100%"
-		style:z-index="14"
-		style:top="50vh"
-	></div>
-
 	<img
 		class="title"
 		src="./images/logo.webp"
 		alt="depicts the official GoldenHorn logo of a black goat with long curved golden horns"
 		style:top="calc(20vh + {scroll * 0.6}px)"
 	/>
-
-	<div class="info">info</div>
+	<div class="info"></div>
 </main>
 
 <style>
@@ -117,7 +111,6 @@
 		align-content: center;
 		justify-content: center;
 		flex-direction: column;
-		background-color: rgb(160, 233, 241);
 	}
 
 	.title {
@@ -130,9 +123,9 @@
 
 	.parallax {
 		width: 100%;
-		height: 140vh;
 		position: relative;
-		overflow: hidden;
+        overflow: hidden;
+        
 	}
 
 	.sky {
@@ -154,10 +147,15 @@
 		background-color: rgb(68, 51, 27);
 		width: 100%;
 		min-height: 100vh;
-		z-index: 13;
+		z-index: 10;
 	}
 
-	@media (min-width: 1921px) {
+    @media (min-width: 1921px) {
+        .parallax {
+            height: 185vh;
+            margin-bottom: -30vh;
+        }
+
 		.parallax-layer {
 			background-position: center top;
 		}
@@ -167,8 +165,13 @@
 		}
 	}
 	@media (max-width: 1920px) {
+        .parallax {
+            height: 185vh;
+            margin-bottom: -30vh;
+        }
+
 		.parallax-layer {
-			background-position: center top;
+			background-position-x: center;
 		}
 
 		.title {
@@ -176,8 +179,13 @@
 		}
 	}
 	@media (max-width: 1280px) {
+        .parallax {
+            height: 185vh;
+            margin-bottom: -50vh;
+        }
+
 		.parallax-layer {
-			background-position: 35% center;
+			background-position-x: 35%;
 		}
 
 		.title {
@@ -185,12 +193,18 @@
 		}
 	}
 	@media (max-width: 480px) {
+        .parallax {
+            height: 185vh;
+            margin-bottom: -50vh;
+        }
+
 		.parallax-layer {
-			background-position: 30% center;
+			background-position-x: 30%;
 		}
 
 		.title {
 			font-size: 3rem;
 		}
 	}
+
 </style>
