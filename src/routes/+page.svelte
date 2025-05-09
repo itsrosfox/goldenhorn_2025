@@ -1,19 +1,21 @@
 <script lang="ts">
+	import { onMount } from "svelte";
+
 	let width = $state(1920);
 	let height = $state(1080);
 	let scroll = $state(0);
 
-	// onMount(() => {
-	// 	// give the browser a tick to render
-	// 	setTimeout(() => {
-	// 		requestAnimationFrame(() => {
-	// 			window.scrollTo({
-	// 				top: window.innerHeight * 0.2, // for example, 80% down
-	// 				behavior: 'smooth'
-	// 			});
-	// 		});
-	// 	}, 1000);
-	// });
+	onMount(() => {
+		// give the browser a tick to render
+		setTimeout(() => {
+			requestAnimationFrame(() => {
+				window.scrollTo({
+					top: window.innerHeight * 0.2, // for example, 80% down
+					behavior: 'smooth'
+				});
+			});
+		}, 1000);
+	});
 
 	const configWidth = 1920;
 	const configHeight = 1262;
@@ -29,14 +31,9 @@
 	const moo_start: [number, number] = $derived([-5, 20]);
 	const moo_end: [number, number] = $derived([65, -130]);
 	const my_planet_needs_me = $derived(scroll / height);
-    
-    function Clamp01(t: number): number {
-        return Math.max(Math.min(t, 1.0), 0.0);
-    }
 
 	function Lerp(from: number, to: number, t: number): number {
-        console.log(Clamp01(t));
-        return Clamp01(1 - t) * from + Clamp01(t) * to;
+        return (1 - t) * from + t * to;
 	}
 
 	function Lerp2D(from: [number, number], to: [number, number], t: number): [number, number] {
