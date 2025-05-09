@@ -19,18 +19,24 @@
 	const configHeight = 1262;
 	const configAspectRatio = $derived(configWidth / configHeight);
 
-    const parallaxWidth = $derived(width);
-	const parallaxHeight = $derived(parallaxWidth / configAspectRatio);
+    const landscape = $derived(width > height);
 
+	const parallaxHeight = $derived(landscape ? width / configAspectRatio : height);
+    const parallaxWidth = $derived(landscape ? width : height * configAspectRatio);
 
-	const aw_shit = $derived(scroll / height > 0.7);
+	const aw_shit = $derived(scroll / height > 0.6);
 
 	const moo_start: [number, number] = $derived([-5, 20]);
 	const moo_end: [number, number] = $derived([65, -130]);
 	const my_planet_needs_me = $derived(scroll / height);
+    
+    function Clamp01(t: number): number {
+        return Math.max(Math.min(t, 1.0), 0.0);
+    }
 
 	function Lerp(from: number, to: number, t: number): number {
-		return from + t * (to - from);
+        console.log(Clamp01(t));
+        return Clamp01(1 - t) * from + Clamp01(t) * to;
 	}
 
 	function Lerp2D(from: [number, number], to: [number, number], t: number): [number, number] {
@@ -38,7 +44,7 @@
 	}
 
 	const parallaxConfig = {
-        'far_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.93, visible: true, scale: 1.0 },
+		'far_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.93, visible: true, scale: 1.0 },
 		'near_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.9, visible: true, scale: 1.0 },
 		'trees.png': { offset: [0, 0], max: [0, 0], speed: 0.8, visible: true, scale: 1.0 },
 		'moo.png': { offset: moo_start, max: [0, 0], speed: 0.7, visible: true, scale: 1.0 },
@@ -50,13 +56,13 @@
 		'goldy.png': { offset: [0, 0], max: [0, 0], speed: 0.2, visible: true, scale: 1.0 },
 		'hen.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
 		'aw_shit.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: false, scale: 1.0 },
-		'bottom.png': { offset: [0, 200], max: [0, 10], speed: -0.4, visible: true, scale: 1.0 },
+		'bottom.png': { offset: [0, 200], max: [0, 10], speed: -0.4, visible: true, scale: 1.0 }
 	};
 
 	$effect(() => {
 		parallaxConfig['aw_shit.png'].visible = aw_shit;
 		parallaxConfig['moo.png'].offset = Lerp2D(moo_start, moo_end, my_planet_needs_me);
-        // parallaxConfig['moo.png'].scale = Lerp(1.0, 0.1, my_planet_needs_me);
+		// parallaxConfig['moo.png'].scale = Lerp(1.0, 0.1, my_planet_needs_me);
 	});
 </script>
 
@@ -67,8 +73,8 @@
 		<div
 			class="sky"
 			style:background-image="url('./images/sky.png')"
-            style:background-size="{parallaxWidth}px {parallaxHeight}px"
-            style:top="calc({scroll * 1.0}px)"
+			style:background-size="{parallaxWidth}px {parallaxHeight}px"
+			style:top="calc({scroll * 1.0}px)"
 		></div>
 		{#each Object.entries(parallaxConfig) as [name, c], i}
 			<div
@@ -91,11 +97,10 @@
 		style:background-image="url('./images/aw_my_gawd.png')"
 		style:height="100%"
 		style:z-index="14"
-        style:top=50vh
+		style:top="50vh"
 	></div>
 
-
-    <img
+	<img
 		class="title"
 		src="./images/logo.webp"
 		alt="depicts the official GoldenHorn logo of a black goat with long curved golden horns"
@@ -133,19 +138,18 @@
 		overflow: hidden;
 	}
 
-    .sky {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-repeat: no-repeat;
-        background-position-x:center;
-    }
+	.sky {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background-repeat: no-repeat;
+		background-position-x: center;
+	}
 
 	.parallax-layer {
 		width: 100%;
 		height: 100%;
 		position: absolute;
-		background-size: contain;
 		background-repeat: no-repeat;
 	}
 
