@@ -1,45 +1,19 @@
-<script lang="ts">
+<script>
 	import { onMount } from 'svelte';
 
-	let width = $state(1920);
-	let height = $state(1080);
-	let scroll = $state(0);
+	const moo_start = [-10,20];
+	const moo_end = [50, -200];
 
-	onMount(() => {
-		setTimeout(() => {
-			requestAnimationFrame(() => {
-				window.scrollTo({
-					top: window.innerHeight * 0.2,
-					behavior: 'smooth'
-				});
-			});
-		}, 1000);
-	});
-
-	const configWidth = 1920;
-	const configHeight = 1262;
-	const configAspectRatio = $derived(configWidth / configHeight);
-
-	const landscape = $derived(width > height);
-
-	const parallaxHeight = $derived(landscape ? width / configAspectRatio : height);
-	const parallaxWidth = $derived(landscape ? width : height * configAspectRatio);
-
-	const aw_shit = $derived(scroll / height > 0.8);
-
-	const moo_start: [number, number] = $derived([-5, 20]);
-	const moo_end: [number, number] = $derived([65, -130]);
-	const my_planet_needs_me = $derived(scroll / height);
-
-	function Lerp(from: number, to: number, t: number): number {
+	function Lerp(from, to, t) {
 		return (1 - t) * from + t * to;
 	}
 
-	function Lerp2D(from: [number, number], to: [number, number], t: number): [number, number] {
+	function Lerp2D(from, to, t) {
 		return [Lerp(from[0], to[0], t), Lerp(from[1], to[1], t)];
 	}
 
-	const parallaxConfig = {
+	const config = {
+		'sky.png': { offset: [0, 0], max: [0, 0], speed: 1.0, visible: true, scale: 1.0 },
 		'far_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.93, visible: true, scale: 1.0 },
 		'near_mountains.png': { offset: [0, 0], max: [0, 0], speed: 0.9, visible: true, scale: 1.0 },
 		'trees.png': { offset: [0, 0], max: [0, 0], speed: 0.8, visible: true, scale: 1.0 },
@@ -58,46 +32,93 @@
 		'leaves.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 }
 	};
 
-	$effect(() => {
-		parallaxConfig['aw_shit.png'].visible = aw_shit;
-		parallaxConfig['moo.png'].offset = Lerp2D(moo_start, moo_end, my_planet_needs_me);
-		// parallaxConfig['moo.png'].scale = Lerp(1.0, 0.1, my_planet_needs_me);
+	onMount(() => {
+		let width = window.innerWidth;
+		let height = window.innerHeight;
+		let landscape = width > height;
+		let aspectRatio = 1584 / 1300;
+
+		function init() {
+			let i = 0;
+			for (let [element_id, properties] of Object.entries(config)) {
+				var element = document.getElementById(element_id);
+				element.style.backgroundImage = `url("./images/${element_id}"`;
+				element.style.backgroundSize = `
+			${landscape ? width : height * aspectRatio}px	
+			${landscape ? width / aspectRatio : height}px `;
+				element.style.zIndex = i++;
+			}
+
+			draw(0);
+		}
+
+		init();
+
+		let lastScroll = 0;
+		let ticking = false;
+
+		function draw(scroll) {
+			config['aw_shit.png'].visible = scroll / height > 0.8;
+
+			document.getElementById('title').style.marginTop = `calc(20vh + ${scroll * 0.6}px`;
+
+			let my_planet_needs_me = scroll / height;
+
+			config['moo.png'].offset = Lerp2D(moo_start, moo_end, my_planet_needs_me);
+
+			for (let [element_id, properties] of Object.entries(config)) {
+				var element = document.getElementById(element_id);
+				element.style.visibility = properties.visible ? 'visible' : 'hidden';
+				element.style.marginLeft = `${properties.offset[0]}px`;
+				element.style.marginTop = `calc(var(--sky-height) + ${Math.max(
+					properties.offset[1] / aspectRatio + scroll * properties.speed,
+					properties.max[1]
+				)}px`;
+			}
+		}
+
+		document.addEventListener('scroll', (event) => {
+			lastScroll = window.scrollY;
+
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					draw(lastScroll);
+					ticking = false;
+				});
+
+				ticking = true;
+			}
+		});
 	});
 </script>
 
-<svelte:window bind:outerWidth={width} bind:outerHeight={height} bind:scrollY={scroll} />
+<svelte:window />
 
 <main class="main">
 	<div class="parallax">
-		<div
-			class="sky"
-			style:background-image="url('./images/sky.png')"
-			style:background-size="{parallaxWidth}px {parallaxHeight}px"
-			style:margin-top="calc({scroll * 1.0}px)"
-		></div>
-
 		<img
+			id="title"
 			class="title"
 			src="./images/logo.webp"
 			alt="depicts the official GoldenHorn logo of a black goat with long curved golden horns"
-			style:margin-top="calc(20vh + {scroll * 0.6}px)"
 		/>
-
-		{#each Object.entries(parallaxConfig) as [name, c], i}
-			<div
-				class="parallax-layer"
-				style:visibility={c.visible ? 'visible' : 'hidden'}
-				style:background-image="url('./images/{name}')"
-				style:background-size="{parallaxWidth}px {parallaxHeight}px"
-				style:margin-left="{c.offset[0]}px"
-				style:margin-top="calc(var(--sky-height) + {Math.max(
-					c.offset[1] * configAspectRatio + scroll * c.speed,
-					c.max[1]
-				)}px)"
-				style:transform="translateY(100px)"
-				style:z-index={i}
-			></div>
-		{/each}
+		<div id="sky.png" class="parallax-layer"></div>
+		<div id="far_mountains.png" class="parallax-layer"></div>
+		<div id="near_mountains.png" class="parallax-layer"></div>
+		<div id="trees.png" class="parallax-layer"></div>
+		<div id="moo.png" class="parallax-layer"></div>
+		<div id="mukice.png" class="parallax-layer"></div>
+		<div id="ufo.png" class="parallax-layer"></div>
+		<div id="barn.png" class="parallax-layer"></div>
+		<div id="far_field.png" class="parallax-layer"></div>
+		<div id="near_field.png" class="parallax-layer"></div>
+		<div id="cocks.png" class="parallax-layer"></div>
+		<div id="goldy.png" class="parallax-layer"></div>
+		<div id="hen.png" class="parallax-layer"></div>
+		<div id="aw_shit.png" class="parallax-layer"></div>
+		<div id="bottom.png" class="parallax-layer"></div>
+		<div id="aw_my_gawd.png" class="parallax-layer"></div>
+		<div id="leaves.png" class="parallax-layer"></div>
 	</div>
 
 	<div class="info"></div>
@@ -113,7 +134,8 @@
 		align-content: center;
 		justify-content: center;
 		flex-direction: column;
-        background-color: rgb(173, 235, 243);
+		background-color: rgb(173, 235, 243);
+		overflow: hidden;
 	}
 
 	.title {
@@ -121,27 +143,17 @@
 		display: flex;
 		position: sticky;
 		align-self: start;
-        justify-self: center;
+		justify-self: center;
 		width: 20rem;
-		z-index: 15;
+		z-index: 5;
 	}
 
 	.parallax {
 		height: 185vh;
 		width: 100%;
 		position: relative;
-		overflow: hidden;
 		display: grid;
 		grid-template-areas: 'bla';
-	}
-
-	.sky {
-		position: sticky;
-		grid-area: bla;
-		width: 100%;
-		height: 100%;
-		background-repeat: no-repeat;
-		background-position-x: center;
 	}
 
 	.parallax-layer {
@@ -159,13 +171,13 @@
 		z-index: 10;
 	}
 
-	@media (min-width: 1921px) {
+	@media (min-width: 1920px) {
 		.parallax {
-			margin-bottom: -30vh;
+			margin-bottom: calc(-30vh);
 		}
 
 		.parallax-layer {
-			background-position: center top;
+			background-position-x: center;
 		}
 
 		.title {
@@ -174,7 +186,7 @@
 	}
 	@media (max-width: 1920px) {
 		.parallax {
-			margin-bottom: -30vh;
+			margin-bottom: calc(-50vh);
 		}
 
 		.parallax-layer {
@@ -187,7 +199,7 @@
 	}
 	@media (max-width: 1280px) {
 		.parallax {
-			margin-bottom: -50vh;
+			margin-bottom: calc(-65vh);
 		}
 
 		.parallax-layer {
@@ -200,7 +212,7 @@
 	}
 	@media (max-width: 480px) {
 		.parallax {
-			margin-bottom: -50vh;
+			margin-bottom: calc(-65vh);
 		}
 
 		.parallax-layer {
