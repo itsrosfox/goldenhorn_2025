@@ -1,8 +1,9 @@
 <script>
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 
-	const moo_start = [-10, 20];
-	const moo_end = [50, -200];
+	const moo_start = [0, 0];
+	const moo_end = [0.025, -0.1];
 
 	function Lerp(from, to, t) {
 		return (1 - t) * from + t * to;
@@ -27,7 +28,7 @@
 		'goldy.png': { offset: [0, 0], max: [0, 0], speed: 0.2, visible: true, scale: 1.0 },
 		'hen.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
 		'aw_shit.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: false, scale: 1.0 },
-		'bottom.png': { offset: [0, 350], max: [0, 150], speed: -0.4, visible: true, scale: 1.0 },
+		'bottom.png': { offset: [0, 0.2], max: [0, 0.5], speed: -0.2, visible: true, scale: 1.0 },
 		'aw_my_gawd.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 },
 		'leaves.png': { offset: [0, 0], max: [0, 0], speed: 0.1, visible: true, scale: 1.0 }
 	};
@@ -35,23 +36,38 @@
 	onMount(() => {
 		let pageWidth = window.innerWidth;
 		let pageHeight = window.innerHeight;
-		let landscape = pageWidth > pageHeight;
 
 		let imageHeight = 1300;
 		let imageWidth = 1584;
 		let imageAspectRatio = imageWidth / imageHeight;
 
 		let fuckme = pageWidth > imageWidth;
+		let fuckme2 = pageHeight < imageHeight;
+
+		let landscape = pageWidth > pageHeight;
 
 		let finalWidth = 0;
 		let finalHeight = 0;
-		if (fuckme) {
-			finalWidth = pageWidth;
-			finalHeight = pageWidth / imageAspectRatio;
+		if (fuckme || fuckme2) {
+			if(landscape) {
+				finalWidth = pageWidth;
+				finalHeight = pageWidth / imageAspectRatio;
+			} else {
+				finalWidth = pageHeight * imageAspectRatio;
+				finalHeight = pageHeight * 1.2;
+			}
+
 		} else {
-			finalWidth = imageWidth / imageAspectRatio;
-			finalHeight = pageHeight;
+			if(landscape) {
+				finalWidth = pageWidth / imageAspectRatio;
+				finalHeight = pageHeight;
+			} else {
+				finalWidth = pageHeight * imageAspectRatio;
+				finalHeight = pageHeight * 1.2;
+			}
 		}
+
+		document.getElementById('parallax').style.height = `${finalHeight - finalHeight * 0.1}px`;
 
 		function init() {
 			let i = 0;
@@ -59,6 +75,7 @@
 				var element = document.getElementById(element_id);
 				element.style.backgroundImage = `url("./images/${element_id}"`;
 				element.style.backgroundSize = `${finalWidth}px ${finalHeight}px `;
+				element.style.zIndex = i++;
 			}
 
 			draw(0);
@@ -75,7 +92,6 @@
 			console.log(scroll);
 
 			document.getElementById('title').style.marginTop = `calc(5vh + ${scroll * 0.6}px`;
-			document.getElementById('parallax').style.height = `${finalHeight - 200}px`;
 
 			let my_planet_needs_me = scroll / pageHeight;
 
@@ -84,11 +100,8 @@
 			for (let [element_id, properties] of Object.entries(config)) {
 				var element = document.getElementById(element_id);
 				element.style.visibility = properties.visible ? 'visible' : 'hidden';
-				element.style.marginLeft = `${properties.offset[0]}px`;
-				element.style.marginTop = `calc(${Math.max(
-					properties.offset[1] / imageAspectRatio + scroll * properties.speed,
-					properties.max[1]
-				)}px`;
+				element.style.marginLeft = `${properties.offset[0] * finalWidth}px`;
+				element.style.marginTop = `calc(${properties.offset[1] * finalHeight + scroll * properties.speed}px`;
 			}
 		}
 
@@ -189,6 +202,7 @@
 
 		.title {
 			font-size: 5rem;
+			width: 20rem;
 		}
 	}
 	@media (max-width: 1920px) {
@@ -207,6 +221,7 @@
 
 		.title {
 			font-size: 3rem;
+			width: 15rem;
 		}
 	}
 	@media (max-width: 480px) {
@@ -216,6 +231,7 @@
 
 		.title {
 			font-size: 3rem;
+			width: 10rem;
 		}
 	}
 </style>
