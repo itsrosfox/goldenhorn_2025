@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 
-	const moo_start = [-10,20];
+	const moo_start = [-10, 20];
 	const moo_end = [50, -200];
 
 	function Lerp(from, to, t) {
@@ -33,20 +33,32 @@
 	};
 
 	onMount(() => {
-		let width = window.innerWidth;
-		let height = window.innerHeight;
-		let landscape = width > height;
-		let aspectRatio = 1584 / 1300;
+		let pageWidth = window.innerWidth;
+		let pageHeight = window.innerHeight;
+		let landscape = pageWidth > pageHeight;
+
+		let imageHeight = 1300;
+		let imageWidth = 1584;
+		let imageAspectRatio = imageWidth / imageHeight;
+
+		let fuckme = pageWidth > imageWidth;
+
+		let finalWidth = 0;
+		let finalHeight = 0;
+		if (fuckme) {
+			finalWidth = pageWidth;
+			finalHeight = pageWidth / imageAspectRatio;
+		} else {
+			finalWidth = imageWidth / imageAspectRatio;
+			finalHeight = pageHeight;
+		}
 
 		function init() {
 			let i = 0;
 			for (let [element_id, properties] of Object.entries(config)) {
 				var element = document.getElementById(element_id);
 				element.style.backgroundImage = `url("./images/${element_id}"`;
-				element.style.backgroundSize = `
-			${landscape ? width : height * aspectRatio}px	
-			${landscape ? width / aspectRatio : height}px `;
-				element.style.zIndex = i++;
+				element.style.backgroundSize = `${finalWidth}px ${finalHeight}px `;
 			}
 
 			draw(0);
@@ -58,11 +70,14 @@
 		let ticking = false;
 
 		function draw(scroll) {
-			config['aw_shit.png'].visible = scroll / height > 0.8;
+			config['aw_shit.png'].visible = scroll / finalHeight > 0.5;
 
-			document.getElementById('title').style.marginTop = `calc(20vh + ${scroll * 0.6}px`;
+			console.log(scroll);
 
-			let my_planet_needs_me = scroll / height;
+			document.getElementById('title').style.marginTop = `calc(5vh + ${scroll * 0.6}px`;
+			document.getElementById('parallax').style.height = `${finalHeight - 200}px`;
+
+			let my_planet_needs_me = scroll / pageHeight;
 
 			config['moo.png'].offset = Lerp2D(moo_start, moo_end, my_planet_needs_me);
 
@@ -70,8 +85,8 @@
 				var element = document.getElementById(element_id);
 				element.style.visibility = properties.visible ? 'visible' : 'hidden';
 				element.style.marginLeft = `${properties.offset[0]}px`;
-				element.style.marginTop = `calc(var(--sky-height) + ${Math.max(
-					properties.offset[1] / aspectRatio + scroll * properties.speed,
+				element.style.marginTop = `calc(${Math.max(
+					properties.offset[1] / imageAspectRatio + scroll * properties.speed,
 					properties.max[1]
 				)}px`;
 			}
@@ -95,7 +110,7 @@
 <svelte:window />
 
 <main class="main">
-	<div class="parallax">
+	<div id="parallax" class="parallax">
 		<img
 			id="title"
 			class="title"
@@ -121,21 +136,16 @@
 		<div id="leaves.png" class="parallax-layer"></div>
 	</div>
 
-	<div class="info"></div>
+	<div id="info" class="info"></div>
 </main>
 
 <style>
-	:root {
-		--sky-height: 30vh;
-	}
-
 	.main {
 		display: flex;
 		align-content: center;
 		justify-content: center;
 		flex-direction: column;
 		background-color: rgb(173, 235, 243);
-		overflow: hidden;
 	}
 
 	.title {
@@ -149,11 +159,13 @@
 	}
 
 	.parallax {
-		height: 185vh;
+		background-color: rgb(68, 51, 27);
+		overflow: hidden;
 		width: 100%;
 		position: relative;
 		display: grid;
 		grid-template-areas: 'bla';
+		height: 1300px;
 	}
 
 	.parallax-layer {
@@ -168,14 +180,9 @@
 		background-color: rgb(68, 51, 27);
 		width: 100%;
 		min-height: 100vh;
-		z-index: 10;
 	}
 
 	@media (min-width: 1920px) {
-		.parallax {
-			margin-bottom: calc(-30vh);
-		}
-
 		.parallax-layer {
 			background-position-x: center;
 		}
@@ -185,10 +192,6 @@
 		}
 	}
 	@media (max-width: 1920px) {
-		.parallax {
-			margin-bottom: calc(-50vh);
-		}
-
 		.parallax-layer {
 			background-position-x: center;
 		}
@@ -198,10 +201,6 @@
 		}
 	}
 	@media (max-width: 1280px) {
-		.parallax {
-			margin-bottom: calc(-65vh);
-		}
-
 		.parallax-layer {
 			background-position-x: 35%;
 		}
@@ -211,10 +210,6 @@
 		}
 	}
 	@media (max-width: 480px) {
-		.parallax {
-			margin-bottom: calc(-65vh);
-		}
-
 		.parallax-layer {
 			background-position-x: 27.5%;
 		}
